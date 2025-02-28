@@ -5,10 +5,10 @@ from datetime import datetime
 
 # Database connection settings
 DB_CONFIG = {
-    "host": "your_host",      # Change this
-    "user": "your_user",      # Change this
-    "password": "your_pass",  # Change this
-    "database": "your_db",    # Change this
+    "host": "localhost",      # Change this
+    "user": "python_conn",      # Change this
+    "password": "blackwood99++",  # Change this
+    "database": "ssf",    # Change this
     "port": 3306  # Default MySQL port
 }
 
@@ -25,7 +25,7 @@ def process_file(file_path):
         df = pd.read_excel(file_path, engine='openpyxl')
 
         # Ensure columns match expected format
-        if set(df.columns) != {"id", "hour", "agent", "case", "status"}:
+        if set(df.columns) != {"report", "hour", "agent", "casetype", "status"}:
             print(f"Skipping {file_path}: Invalid columns")
             return
 
@@ -39,10 +39,11 @@ def process_file(file_path):
         # Insert data into MySQL
         for _, row in df.iterrows():
             sql = """
-                INSERT INTO FileReporter (id, hour, agent, case, status)
+                INSERT INTO filereporter (report, hour, agent, casetype, status)
                 VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(sql, (row["id"], row["hour"], row["agent"], row["case"], row["status"]))
+            print(row["report"], row["hour"], row["agent"], row["casetype"], row["status"])
+            cursor.execute(sql, (row["report"], row["hour"], row["agent"], row["casetype"], row["status"]))
 
         # Commit and close connection
         conn.commit()
@@ -51,7 +52,7 @@ def process_file(file_path):
 
         print(f"Successfully uploaded {file_path}")
     except Exception as e:
-        print(f"Error processing {file_path}: {e}")
+        print(f"Error processing {file_path}: {e} ")
 
 def main():
     """Scans the input directory for Excel files and processes them."""
